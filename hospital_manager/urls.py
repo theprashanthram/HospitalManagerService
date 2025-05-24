@@ -5,4 +5,5 @@ from hospital_manager.views import index
 urlpatterns = [
     path('', index, name='react-index'), # Frontend
     path('api/', include('apps.rest_backend.urls')), # Rest Backend
+    path('auth/', include('apps.auth.urls')) # Auth service
 ]

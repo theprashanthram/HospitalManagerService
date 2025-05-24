@@ -5,13 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run prep_rest_client && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prep_rest_client": "openapi-typescript-codegen --input ../schema.yml --output node_modules/hospital-manager-client --client axios"
+    "prep_rest_client": " npx openapi-typescript-codegen --input ../build/schema.yml --output node_modules/hospital-manager-client --client axios"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^7.1.0",
+    "bootstrap": "^5.3.6",
     "react": "^19.1.0",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {

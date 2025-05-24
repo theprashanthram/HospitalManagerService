@@ -1,6 +1,8 @@
 # Django
 *.sqlite3
 .DS_Store
+build/
+dist/
 
 # React
 frontend/node_modules
