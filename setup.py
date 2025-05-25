@@ -32,5 +32,6 @@ setup(
         'sqlparse==0.5.3',
         'typing_extensions==4.13.2',
         'drf-spectacular',
+        'psycopg2-binary',
     ]
 )

@@ -3,6 +3,7 @@
 .DS_Store
 build/
 dist/
+hospitalmanagerservice.egg-info
 
 # React
 frontend/node_modules

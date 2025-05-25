@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,6 +23,7 @@ INSTALLED_APPS = [
     'apps.rest_backend',
     # Third-party apps
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
 ]
 
@@ -32,7 +34,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-AUTH_USER_MODEL = 'hospital_manager_auth.User'
+AUTH_USER_MODEL = 'hospital_manager_auth.HospitalUser'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
@@ -56,11 +58,22 @@ WSGI_APPLICATION = 'hospital_manager.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',            # your Postgres database name
+        'USER': 'admin',          # your Postgres username
+        'PASSWORD': 'admin',  # your Postgres password
+        'HOST': 'localhost',       # connects to Docker Postgres on your Mac
+        'PORT': '5432',            # default Postgres port exposed by Docker
     }
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),   # e.g. 15 minutes
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),      # e.g. 7 days
+    # Optional: More security-related settings
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
