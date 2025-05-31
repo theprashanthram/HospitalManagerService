@@ -68,8 +68,8 @@ DATABASES = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),   # e.g. 15 minutes
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),      # e.g. 7 days
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     # Optional: More security-related settings
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
