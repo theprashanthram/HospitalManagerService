@@ -13,6 +13,19 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    "django.middleware.common.CommonMiddleware",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:5173",
+]
+
+
 INSTALLED_APPS = [
     # Inbuilt Django apps
     'django.contrib.staticfiles',
@@ -23,8 +36,9 @@ INSTALLED_APPS = [
     'apps.rest_backend',
     # Third-party apps
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
+    # 'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -70,9 +84,6 @@ DATABASES = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    # Optional: More security-related settings
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
 }
 
 # Internationalization

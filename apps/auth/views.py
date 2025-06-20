@@ -1,13 +1,17 @@
+import logging
+
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .serializers.auth_token import ObtainAuthTokenSerializer
+from .serializers.auth_token import ObtainAuthTokenResponseSerializer, ObtainAuthTokenRequestSerializer
 from .serializers.user_registration import UserRegistrationRequestSerializer, UserRegistrationResponseSerializer
 
+logger = logging.getLogger(__name__)
 
 class RegisterUserView(APIView):
     """
@@ -38,8 +42,9 @@ class ObtainAuthTokenView(TokenObtainPairView):
     Get Access Token (as json field) and Refresh Token (as cookie)
     """
     @extend_schema(
-        operation_id='obtainAccessToken',
-        responses=ObtainAuthTokenSerializer,
+        operation_id='obtainAuthToken',
+        request=ObtainAuthTokenRequestSerializer,
+        responses=ObtainAuthTokenResponseSerializer,
         description='Obtain access token using username and password',
     )
     def post(self, request, *args, **kwargs):
@@ -51,8 +56,7 @@ class ObtainAuthTokenView(TokenObtainPairView):
 
             # Remove refresh token from response body
             response.data.pop('refresh', None)
-
-            print(f"refresh --> {refresh_token}")
+            response.data.pop('access', None)
 
             # Set refresh token as HttpOnly cookie
             response.set_cookie(
@@ -62,10 +66,36 @@ class ObtainAuthTokenView(TokenObtainPairView):
                 secure=False,
                 samesite='Lax',
                 max_age=7 * 24 * 60 * 60,  # 7 days in seconds
-                path='/auth/'  # restrict cookie to refresh token api calls
+                path='/auth/refresh'  # restrict cookie to refresh token api calls
             )
 
             # Set access token in response body (unchanged)
-            response.data['access'] = access_token
+            response.data['access_token'] = access_token
 
         return response
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+    """
+    Refresh access token using refresh token from HttpOnly cookie.
+    """
+
+    @extend_schema(
+        operation_id='refreshAuthToken',
+        responses=ObtainAuthTokenResponseSerializer,
+        description='Refresh access token using http cookie',
+    )
+    def get(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response({'detail': 'Refresh token missing'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        serializer = self.get_serializer(data={'refresh': refresh_token})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except (TokenError, InvalidToken) as err:
+            logger.error("Token refresh error: %s", err.default_detail)
+            return Response({'detail': 'Invalid or blacklisted token.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response({'access_token': serializer.validated_data['access']})
