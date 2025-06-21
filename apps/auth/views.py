@@ -1,5 +1,6 @@
 import logging
 
+from django.db import IntegrityError
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
@@ -88,14 +89,14 @@ class CookieTokenRefreshView(TokenRefreshView):
     def get(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
-            return Response({'detail': 'Refresh token missing'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': 'Refresh token missing'}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = self.get_serializer(data={'refresh': refresh_token})
 
         try:
             serializer.is_valid(raise_exception=True)
         except (TokenError, InvalidToken) as err:
-            logger.error("Token refresh error: %s", err.default_detail)
-            return Response({'detail': 'Invalid or blacklisted token.'}, status=status.HTTP_401_UNAUTHORIZED)
+            logger.error("Token refresh error: %s", err)
+            return Response({'message': 'Invalid or expired or blacklisted token.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response({'access_token': serializer.validated_data['access']})
