@@ -33,5 +33,9 @@ setup(
         'typing_extensions==4.13.2',
         'drf-spectacular',
         'psycopg2-binary',
+        'pytest',
+        'pytest-cov',
+        'pytest-django',
+        'pytest-html',
     ]
 )
